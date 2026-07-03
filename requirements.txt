@@ -1,0 +1,34 @@
+# =====================================================================
+# Tier A — LOCAL, CPU-ONLY dependencies (runs on the current laptop)
+# Python 3.11 · install into a venv. See INSTALL.md for commands.
+# Pinned to compatible ranges; CPU-only torch is installed separately
+# (see INSTALL.md) to avoid pulling CUDA wheels.
+# =====================================================================
+
+# --- Ingestion / PDF / images ---
+pymupdf>=1.24.0          # digital-PDF text extraction (path 2a) + render
+pdf2image>=1.17.0        # rasterize scanned PDFs (needs poppler, see INSTALL.md)
+pillow>=10.3.0           # image IO
+opencv-python-headless>=4.9.0   # deskew, denoise, binarize, seal/watermark suppression
+numpy>=1.26,<2.0
+
+# --- Japanese OCR cascade ---
+yomitoku>=0.5.0          # PRIMARY: JP-native OCR (detect+recognize+layout+tables), CPU OK
+manga-ocr>=0.1.11        # FALLBACK: robust on stylized / hard / handwritten-ish lines
+# pytesseract>=0.3.10    # OPTIONAL last-resort (requires Tesseract binary + jpn data)
+
+# --- Structured output / rendering ---
+pydantic>=2.6            # canonical intermediate JSON schema (§4 of REQUIREMENTS.md)
+markdown-it-py>=3.0      # render/validate Markdown output
+rich>=13.7               # readable CLI logs / progress
+
+# --- Phase 2: vector-less RAG (kept light; no vector DB) ---
+rank-bm25>=0.2.2         # keyword/BM25 retrieval over intermediate blocks
+
+# --- Local translation/reasoning client (model runs in Ollama, see INSTALL.md) ---
+ollama>=0.3.0            # python client for local qwen2.5:3b-instruct
+httpx>=0.27              # async calls / Tier-B stub interface
+
+# --- Dev / quality ---
+python-dotenv>=1.0
+pytest>=8.0

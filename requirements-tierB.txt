@@ -1,0 +1,27 @@
+# =====================================================================
+# Tier B — HEAVY / GPU dependencies (DO NOT install on the current laptop)
+# Use only on a CUDA GPU host: HF Inference Endpoints, RunPod, Colab,
+# or an on-prem Japan node for production (air-gap).
+# These power: VLM handwriting recovery, 12-14B legal reasoning,
+# Phase-2 Q&A. Tier A calls these through a stub interface today.
+# =====================================================================
+
+# --- Serving / inference (GPU) ---
+vllm>=0.5.0                 # high-throughput serving for Shisa/ELYZA on GPU
+transformers>=4.44
+accelerate>=0.33
+# torch with CUDA: install from the CUDA index, see INSTALL.md Tier-B note
+
+# --- Vision-language (handwriting + layout + seal/watermark suppression) ---
+qwen-vl-utils>=0.0.8        # helpers for Qwen2.5-VL-7B
+# (PLaMo-2.1-VL per external plan is an alternative VLM choice)
+
+# --- Fine-tuning on Hugging Face (your stated path) ---
+peft>=0.12                  # LoRA/QLoRA adapters
+bitsandbytes>=0.43          # 4-bit quantization for training/inference
+datasets>=2.20
+trl>=0.9                    # SFT/DPO trainers
+
+# Recommended Tier-B models (pull on the GPU host, not via pip):
+#   Reasoning/translation : shisa-ai/shisa-v2 (12B/14B)  OR  elyza/Llama-3-ELYZA-JP-8B
+#   VLM handwriting       : Qwen/Qwen2.5-VL-7B-Instruct  OR  pfnet/plamo-2.1-vl

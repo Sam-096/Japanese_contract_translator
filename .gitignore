@@ -1,0 +1,39 @@
+--- JCT_Backend_v1 / v2 Virtual Environments & Python Cache ---
+
+/pycache/
+/*.pyc
+/.venv/
+/venv/
+.env
+JCT_Backend_v1/.env
+src/JCT_Backend_v2/.env
+
+--- JCT_frontend (React) Dependencies & Builds ---
+
+/node_modules/
+/dist/
+/build/
+.eslintcache
+.DS_Store
+
+--- OS / IDE Specific ---
+
+.vscode/
+.idea/
+
+--- Contract Processing Runtime Cache & Local Tests ---
+
+JCT_Backend_v1/data/uploads/
+JCT_Backend_v1/data/output/
+source/
+output/
+
+--- Strict Block for Binary Formats ---
+
+*.pdf
+*.xlsx
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.tiff

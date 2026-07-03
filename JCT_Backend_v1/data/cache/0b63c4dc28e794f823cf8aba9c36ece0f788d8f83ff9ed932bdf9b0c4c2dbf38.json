@@ -1,0 +1,90 @@
+{
+  "source_path": "data\\uploads\\2364ec70-2a6c-4be3-9731-24e1e598c88f.pdf",
+  "sha256": "0b63c4dc28e794f823cf8aba9c36ece0f788d8f83ff9ed932bdf9b0c4c2dbf38",
+  "kind": "digital_pdf",
+  "pages": [
+    {
+      "number": 1,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "blocks": [
+        {
+          "id": "p1-b00",
+          "page": 1,
+          "type": "paragraph",
+          "text": "第一条　本契約は甲と乙の間で締結される。",
+          "text_ja": null,
+          "bbox": {
+            "x0": 72.0,
+            "y0": 79.8585205078125,
+            "x1": 352.0,
+            "y1": 93.8585205078125
+          },
+          "source": "pdf_text",
+          "confidence": 1.0,
+          "needs_review": false,
+          "order": 0,
+          "table": null,
+          "cells": null
+        },
+        {
+          "id": "p1-b01",
+          "page": 1,
+          "type": "paragraph",
+          "text": "第二条　賃料は毎月末日までに支払うものとする。",
+          "text_ja": null,
+          "bbox": {
+            "x0": 72.0,
+            "y0": 109.8585205078125,
+            "x1": 394.0,
+            "y1": 123.8585205078125
+          },
+          "source": "pdf_text",
+          "confidence": 1.0,
+          "needs_review": false,
+          "order": 1,
+          "table": null,
+          "cells": null
+        },
+        {
+          "id": "p1-b02",
+          "page": 1,
+          "type": "paragraph",
+          "text": "第三条　連帯保証人は乙の債務を連帯保証する。",
+          "text_ja": null,
+          "bbox": {
+            "x0": 72.0,
+            "y0": 139.8585205078125,
+            "x1": 380.0,
+            "y1": 153.8585205078125
+          },
+          "source": "pdf_text",
+          "confidence": 1.0,
+          "needs_review": false,
+          "order": 2,
+          "table": null,
+          "cells": null
+        },
+        {
+          "id": "p1-b03",
+          "page": 1,
+          "type": "paragraph",
+          "text": "第四条　本契約は自動更新とする。",
+          "text_ja": null,
+          "bbox": {
+            "x0": 72.0,
+            "y0": 169.8585205078125,
+            "x1": 296.0,
+            "y1": 183.8585205078125
+          },
+          "source": "pdf_text",
+          "confidence": 1.0,
+          "needs_review": false,
+          "order": 3,
+          "table": null,
+          "cells": null
+        }
+      ]
+    }
+  ]
+}

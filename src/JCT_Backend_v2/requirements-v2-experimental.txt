@@ -1,0 +1,10 @@
+# Extra dependencies for the JCT_Backend_v2 experimental module ONLY.
+# Not merged into JCT_Backend_v1/requirements.txt — JCT_Backend_v2 is standalone
+# and not imported by the live app. Install into the existing project venv with:
+#   pip install -r src/JCT_Backend_v2/requirements-v2-experimental.txt
+
+ginza>=5.2.0
+ja-ginza>=5.2.0
+weasyprint>=69.0
+httpx>=0.27.0
+pydantic>=2.0

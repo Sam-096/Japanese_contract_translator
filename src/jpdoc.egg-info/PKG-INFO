@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: jpdoc
+Version: 0.1.0
+Summary: Reliable Japanese -> English document pipeline (Tier A, local/CPU)
+Requires-Python: >=3.11

@@ -1,0 +1,18 @@
+# =====================================================================
+# Backend-only additions. Install into the SAME venv as the repo root
+# (which already has torch/yomitoku/manga-ocr/ollama — see INSTALL.md):
+#
+#   pip install -e ..                 # editable install of the jpdoc package
+#   pip install -r JCT_Backend_v1/requirements.txt
+# =====================================================================
+
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+pydantic-settings>=2.5.0
+groq>=0.13.0
+google-generativeai>=0.8.0
+openpyxl>=3.1.5
+httpx>=0.27          # already present via requirements.txt, pinned again for the test client
+psycopg[binary,pool]>=3.2.0   # Postgres/Supabase — document_store, job_service, translation_cache
+redis>=5.0.0                  # translation cache (hash of source text -> translated text)

@@ -1,0 +1,14 @@
+# Netlify build for the JCT_frontend/ folder. Set VITE_API_BASE_URL in the
+# Netlify dashboard (Site settings -> Environment variables) to the deployed backend URL.
+[build]
+  base = "JCT_frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
