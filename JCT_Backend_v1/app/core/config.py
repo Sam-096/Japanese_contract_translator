@@ -84,6 +84,17 @@ class Settings(BaseSettings):
     # HF side — either both are configured or neither is).
     ext_clnt_key: str = ""
 
+    # Ceiling on how long a background job (see job_service.submit) may run
+    # before it's force-marked TRANSLATION_TIMEOUT instead of sitting in
+    # "processing" forever. Default comfortably above the ~14 minutes a
+    # genuine cold YomiToku model download was measured to take, but far
+    # below "stuck for hours" — the actual incident this exists to prevent:
+    # a worker thread that crashed or hung mid-job (e.g. an OOM-killed
+    # container, or an unhandled hang deep in a native OCR call) leaves its
+    # Postgres-backed job status frozen at "processing" forever, since
+    # nothing else was ever going to update it. See job_service.submit.
+    job_timeout_seconds: float = Field(default=1200.0, validation_alias="JOB_TIMEOUT_SECONDS")
+
     app_env: str = "development"
     cors_origins: str = "http://localhost:5173"
     max_upload_mb: int = 25
