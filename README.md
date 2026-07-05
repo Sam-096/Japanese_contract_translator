@@ -1,9 +1,11 @@
+---
 title: Japanese Contract Translator Backend
 emoji: ⛩️
 colorFrom: blue
 colorTo: indigo
 sdk: docker
 pinned: false
+---
 
 Japanese Legal Contract Translator & OCR Hub
 
