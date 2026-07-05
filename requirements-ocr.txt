@@ -1,0 +1,18 @@
+# =====================================================================
+# Japanese OCR cascade — split out from requirements.txt because these
+# (and the CPU torch they depend on, installed separately — see
+# INSTALL.md / Dockerfile) are the only genuinely heavy dependency in this
+# project: ~3-4GB of model weights, confirmed by real measurement to be
+# the sole thing threatening a memory-constrained deployment (a plain
+# digital-PDF request measured ~120-165MB with these never loaded).
+#
+# Needed for local dev (Tier A) and any deployment that must handle
+# scanned PDFs / raw images (e.g. Hugging Face Spaces, Dockerfile).
+# Skipped entirely by memory-constrained deployments (e.g. Render 512MB,
+# Dockerfile.render) that run with LOW_MEMORY_MODE=true and reject
+# scanned/image uploads before this code path is ever reached — see
+# JCT_Backend_v1/app/services/ingest_service.py.
+# =====================================================================
+
+yomitoku>=0.5.0          # PRIMARY: JP-native OCR (detect+recognize+layout+tables), CPU OK
+manga-ocr>=0.1.11        # FALLBACK: robust on stylized / hard / handwritten-ish lines

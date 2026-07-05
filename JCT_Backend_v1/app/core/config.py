@@ -67,6 +67,23 @@ class Settings(BaseSettings):
     # 512MB deployment; leave false for local dev / a larger instance.
     low_memory_mode: bool = Field(default=False, validation_alias="LOW_MEMORY_MODE")
 
+    # --- Render <-> Hugging Face hybrid deployment (see core/proxy.py, core/auth.py) ---
+    # Which physical deployment this process IS. document_store.create() stamps every
+    # new record with this, so any deployment can later tell "did I create this, or
+    # did the other one" by comparing DocumentRecord.processed_by to this value.
+    deployment_name: str = Field(default="render", validation_alias="DEPLOYMENT_NAME")
+    # Set on Render only: the HF Space's base URL. When set (and low_memory_mode is
+    # true), /upload forwards scanned PDFs/images here instead of rejecting them —
+    # see routes_upload.py. Left empty on HF itself (it has nothing to forward to).
+    hf_space_url: str = ""
+    # Shared secret between the paired Render/HF deployments — same value on both.
+    # Sent as `Authorization: Bearer <value>` on every Render->HF proxy call, and
+    # required on every HF request except /health when set (core/auth.py). Unset =
+    # no auth enforced (fine for a standalone deployment not part of a pair) and no
+    # bearer header sent (an unauthenticated proxy call, matching an unauthenticated
+    # HF side — either both are configured or neither is).
+    ext_clnt_key: str = ""
+
     app_env: str = "development"
     cors_origins: str = "http://localhost:5173"
     max_upload_mb: int = 25
@@ -120,6 +137,10 @@ class Settings(BaseSettings):
     @property
     def slack_configured(self) -> bool:
         return bool(self.slack_webhook_url)
+
+    @property
+    def hf_proxy_configured(self) -> bool:
+        return bool(self.hf_space_url)
 
 
 @lru_cache

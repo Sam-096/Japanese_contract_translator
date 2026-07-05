@@ -1,0 +1,47 @@
+# Dockerfile.render — Render deployment (free tier, 512MB RAM). Lightweight:
+# skips the OCR cascade (YomiToku + manga-ocr + CPU torch, ~3-4GB) entirely.
+# LOW_MEMORY_MODE=true (set in render.yaml) rejects scanned PDFs/raw images
+# before that code path is ever reached (see
+# JCT_Backend_v1/app/services/ingest_service.py._check_low_memory_support),
+# so those packages would only bloat the image/build time without ever
+# being used. Digital PDFs (PyMuPDF text extraction, no ML models loaded)
+# measured ~120-165MB real worker RSS across full request cycles — well
+# within 512MB. See Dockerfile for the full-featured (Hugging Face) build.
+#
+# Build context is the REPO ROOT (not JCT_Backend_v1/) because the app
+# imports the sibling src/jpdoc package.
+FROM python:3.11-slim
+
+# libgl1/libglib2.0-0 kept defensively even though cv2 (opencv-python-headless)
+# is never actually imported on this path — its only importers, raster.py
+# and preprocess.py, are lazy-loaded from inside the OCR branch that
+# LOW_MEMORY_MODE makes unreachable. Cheap to keep; avoids a surprise
+# ImportError if that ever changes. poppler-utils dropped: confirmed
+# nothing in the codebase imports pdf2image or shells out to Poppler.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+    fonts-noto-cjk \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /srv
+
+COPY pyproject.toml requirements.txt ./
+COPY src ./src
+COPY JCT_Backend_v1/requirements.txt ./backend-requirements.txt
+
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir -e . \
+    && pip install --no-cache-dir -r backend-requirements.txt
+
+COPY JCT_Backend_v1 ./JCT_Backend_v1
+WORKDIR /srv/JCT_Backend_v1
+
+ENV UPLOAD_DIR=/srv/JCT_Backend_v1/data/uploads \
+    OUTPUT_DIR=/srv/JCT_Backend_v1/data/output \
+    TEMP_DIR=/srv/JCT_Backend_v1/data/tmp \
+    CACHE_DIR=/srv/JCT_Backend_v1/data/cache
+
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

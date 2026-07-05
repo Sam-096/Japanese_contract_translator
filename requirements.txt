@@ -13,14 +13,21 @@ opencv-python-headless>=4.9.0   # deskew, denoise, binarize, seal/watermark supp
 numpy>=1.26,<2.0
 
 # --- Japanese OCR cascade ---
-yomitoku>=0.5.0          # PRIMARY: JP-native OCR (detect+recognize+layout+tables), CPU OK
-manga-ocr>=0.1.11        # FALLBACK: robust on stylized / hard / handwritten-ish lines
+# Moved to requirements-ocr.txt (torch-based, ~3-4GB — the only real memory
+# risk in this whole stack, see JCT_Backend_v1/Dockerfile.render vs
+# Dockerfile). Install requirements-ocr.txt too for local dev / any
+# deployment that needs to handle scanned PDFs or raw images.
 # pytesseract>=0.3.10    # OPTIONAL last-resort (requires Tesseract binary + jpn data)
 
 # --- Structured output / rendering ---
 pydantic>=2.6            # canonical intermediate JSON schema (§4 of REQUIREMENTS.md)
 markdown-it-py>=3.0      # render/validate Markdown output
 rich>=13.7               # readable CLI logs / progress
+# Layout-preserving translated-PDF export (JCT_Backend_v1/app/services/render_service.py).
+# Previously only present as an UNDECLARED transitive dependency of yomitoku — worked by
+# accident as long as yomitoku was always installed alongside it. Caught by actually
+# building Dockerfile.render (which drops yomitoku) and watching it fail on startup.
+reportlab>=4.2.0
 
 # --- Phase 2: vector-less RAG (kept light; no vector DB) ---
 rank-bm25>=0.2.2         # keyword/BM25 retrieval over intermediate blocks

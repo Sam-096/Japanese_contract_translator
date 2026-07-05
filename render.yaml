@@ -4,13 +4,13 @@ services:
   - type: web
     name: jpdoc-backend
     runtime: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./Dockerfile.render
     dockerContext: .
-    # "free" (512MB) by deliberate choice — LOW_MEMORY_MODE below rejects
-    # scanned/image uploads (the only path that needs more RAM than that;
-    # measured ~120-165MB for digital-PDF processing, see JCT_Backend_v1
-    # memory testing). Bump to "standard" (2GB+) and flip LOW_MEMORY_MODE to
-    # "false" if scanned-document support becomes a requirement.
+    # "free" (512MB) by deliberate choice — LOW_MEMORY_MODE below forwards
+    # scanned/image uploads to the paired HF Space (HF_SPACE_URL) instead of
+    # processing them here (measured ~120-165MB for digital-PDF processing,
+    # see JCT_Backend_v1 memory testing). Bump to "standard" (2GB+) and flip
+    # LOW_MEMORY_MODE to "false" if you'd rather Render handle everything itself.
     plan: free
     healthCheckPath: /health
     envVars:
@@ -38,6 +38,12 @@ services:
         value: "false"
       - key: LOW_MEMORY_MODE
         value: "true"
+      - key: DEPLOYMENT_NAME
+        value: render
+      - key: HF_SPACE_URL
+        value: https://samuelkottala096-japanese-contract-translator-backend.hf.space
+      - key: EXT_CLNT_KEY
+        sync: false
       - key: APP_ENV
         value: production
       - key: CORS_ORIGINS

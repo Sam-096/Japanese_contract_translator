@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 
 from app.api import routes_export, routes_jobs, routes_preview, routes_upload
 from app.core import notifications
+from app.core.auth import ClientAuthMiddleware
 from app.core.config import get_settings
 from app.core.error_catalog import present
 from app.core.exceptions import AppError
@@ -28,6 +29,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Added AFTER CORSMiddleware (Starlette wraps outer-to-inner in add order,
+# so CORS — outermost — handles/short-circuits an OPTIONS preflight before
+# it ever reaches this) so EXT_CLNT_KEY auth (core/auth.py) never breaks a
+# browser's CORS preflight. In the Render<->HF pairing this guards, HF is
+# only ever called server-to-server from Render's own proxy code anyway,
+# not from a browser, but this ordering is correct either way.
+app.add_middleware(ClientAuthMiddleware)
 # See core/memory.py: trims glibc's heap back to the OS after every request
 # (Linux-only, no-ops elsewhere). Real hygiene for RSS creep between
 # requests; NOT a fix for a single request needing more peak memory than

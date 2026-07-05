@@ -20,11 +20,14 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 ## 3. Install the Tier-A Python dependencies
 ```powershell
 pip install -r requirements.txt
+pip install -r requirements-ocr.txt   # YomiToku + manga-ocr — needed to test scanned PDFs/images locally
 ```
 
 ## 4. System binaries (not pip-installable)
-- **Poppler** (needed by `pdf2image` for scanned PDFs):
-  download Poppler for Windows, unzip, and add its `bin` folder to PATH.
+- **Poppler**: listed as needed by `pdf2image` for scanned PDFs, but as of the current
+  ingest pipeline (`src/jpdoc/raster.py`) rasterization goes through PyMuPDF + OpenCV
+  directly — `pdf2image`/Poppler are not actually imported anywhere in the code. Skip
+  this unless you've added a code path that uses them.
 - **Tesseract** *(optional, only if you enable the generic fallback)*:
   install the UB-Mannheim build, tick the **Japanese** + **Japanese (vertical)** language
   data during setup, then `pip install pytesseract`.

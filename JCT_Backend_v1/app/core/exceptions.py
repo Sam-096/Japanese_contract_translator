@@ -46,9 +46,34 @@ class ScannedDocumentUnsupportedError(AppError):
     manga-ocr + torch) for a scanned PDF/image. That cascade needs far more
     RAM than a 512MB instance has; letting it start would OOM-crash the
     whole container instead of just failing this one job.
+
+    Only reached when LOW_MEMORY_MODE is true AND no HF_SPACE_URL is
+    configured (a standalone memory-constrained deployment with no proxy
+    partner) — when HF_SPACE_URL IS set, routes_upload.py forwards the
+    upload to it instead of raising this (see core/proxy.py).
     """
     code = "SCANNED_DOCUMENT_UNSUPPORTED"
     status_code = 422
+
+
+class HFProxyError(AppError):
+    """The Render->HF proxy call itself failed (network error, HF Space
+    asleep/cold-starting, non-2xx response) — see core/proxy.py. Distinct
+    from a translation-quality failure: this means the request never even
+    reached HF's actual processing.
+    """
+    code = "HF_PROXY_FAILED"
+    status_code = 502
+
+
+class UnauthorizedError(AppError):
+    """Raised by core/auth.ClientAuthMiddleware when EXT_CLNT_KEY is
+    configured and the request's Authorization header doesn't match — e.g.
+    someone hitting the HF Space's public URL directly without the shared
+    secret Render sends.
+    """
+    code = "UNAUTHORIZED"
+    status_code = 401
 
 
 class TranslationTimeoutError(AppError):

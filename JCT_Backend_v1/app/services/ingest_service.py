@@ -19,6 +19,26 @@ from app.core.exceptions import (
 from app.services import document_store
 
 
+def classify_bytes(filename: str, content: bytes) -> str:
+    """classify() needs a real file on disk (PyMuPDF) — used by
+    routes_upload.py to decide whether to proxy an upload to HF *before*
+    persisting anything locally. Render must not create a document_store
+    record for a document that HF is actually going to own and process
+    (that would leave a dangling, orphaned local record instead of the one
+    real record HF's own /upload creates in the shared DB).
+    """
+    import tempfile
+
+    suffix = Path(filename).suffix.lower()
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp.write(content)
+        tmp_path = Path(tmp.name)
+    try:
+        return classify(tmp_path)
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+
 def save_upload(filename: str, content: bytes) -> document_store.DocumentRecord:
     settings = get_settings()
     settings.upload_dir.mkdir(parents=True, exist_ok=True)

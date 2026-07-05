@@ -76,6 +76,15 @@ _CATALOG: dict[str, ErrorPresentation] = {
     "DOCUMENT_NOT_FOUND": ErrorPresentation(
         "error", "Document Not Found", "We couldn't find this document. It may have expired.", False
     ),
+    "HF_PROXY_FAILED": ErrorPresentation(
+        "critical", "Processing Interrupted",
+        "This document requires additional processing that's temporarily unavailable. "
+        "The team has been notified — please try again shortly.",
+        True,  # the Render<->HF pairing itself is broken — always worth paging for
+    ),
+    "UNAUTHORIZED": ErrorPresentation(
+        "error", "Unauthorized", "Missing or invalid credentials.", False
+    ),
     "INTERNAL_ERROR": _SERVICE_INTERRUPTED,
 }
 

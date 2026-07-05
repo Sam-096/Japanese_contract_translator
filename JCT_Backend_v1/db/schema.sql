@@ -29,9 +29,16 @@ CREATE TABLE IF NOT EXISTS documents (
     translated BOOLEAN NOT NULL DEFAULT FALSE,
     translator_map JSONB NOT NULL DEFAULT '{}'::jsonb,
     export_paths JSONB NOT NULL DEFAULT '{}'::jsonb,
+    -- Which physical deployment (settings.deployment_name — "render"/"hf")
+    -- actually ingested this document and owns its local files. Lets a
+    -- Render<->HF hybrid pair sharing this DB know whether a file-serving
+    -- request (original-file preview) needs to be proxied to the other
+    -- deployment. NULL for rows written before this column existed.
+    processed_by TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS processed_by TEXT;
 
 CREATE TABLE IF NOT EXISTS jobs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

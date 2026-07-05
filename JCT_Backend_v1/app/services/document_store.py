@@ -25,6 +25,11 @@ class DocumentRecord:
     translated: bool = False
     translator_map: dict[str, str] = field(default_factory=dict)
     export_paths: dict[str, Path] = field(default_factory=dict)
+    # Which deployment (settings.deployment_name) actually owns this
+    # document's local files — stamped by create(), not the caller. See
+    # core/proxy.py / routes_preview.py for how this drives Render<->HF
+    # file-serving proxying.
+    processed_by: str | None = None
 
 
 # ---- in-memory fallback (DATABASE_URL not set) ------------------------------
@@ -54,7 +59,7 @@ def _update_memory(document_id: str, **kwargs) -> None:
 # ---- Postgres-backed ---------------------------------------------------------
 def _row_to_record(row: tuple) -> DocumentRecord:
     (doc_id, original_filename, stored_path, kind, document_json,
-     translated, translator_map, export_paths) = row
+     translated, translator_map, export_paths, processed_by) = row
     return DocumentRecord(
         id=str(doc_id),
         original_filename=original_filename,
@@ -64,6 +69,7 @@ def _row_to_record(row: tuple) -> DocumentRecord:
         translated=translated,
         translator_map=translator_map or {},
         export_paths={k: Path(v) for k, v in (export_paths or {}).items()},
+        processed_by=processed_by,
     )
 
 
@@ -74,8 +80,8 @@ def _create_db(record: DocumentRecord) -> None:
         cur.execute(
             """
             INSERT INTO documents (id, original_filename, stored_path, kind,
-                document_json, translated, translator_map, export_paths)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                document_json, translated, translator_map, export_paths, processed_by)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (id) DO NOTHING
             """,
             (
@@ -84,6 +90,7 @@ def _create_db(record: DocumentRecord) -> None:
                 record.translated,
                 json.dumps(record.translator_map),
                 json.dumps({k: str(v) for k, v in record.export_paths.items()}),
+                record.processed_by,
             ),
         )
         conn.commit()
@@ -96,7 +103,7 @@ def _get_db(document_id: str) -> DocumentRecord | None:
         cur.execute(
             """
             SELECT id, original_filename, stored_path, kind, document_json,
-                   translated, translator_map, export_paths
+                   translated, translator_map, export_paths, processed_by
             FROM documents WHERE id = %s
             """,
             (document_id,),
@@ -111,6 +118,7 @@ _COLUMN_MAP = {
     "translated": "translated",
     "translator_map": "translator_map",
     "export_paths": "export_paths",
+    "processed_by": "processed_by",
 }
 
 
@@ -142,6 +150,10 @@ def _update_db(document_id: str, **kwargs) -> None:
 
 # ---- public interface ---------------------------------------------------------
 def create(record: DocumentRecord) -> None:
+    # Always stamped here (not left to the caller) so every record — however
+    # it was created — correctly reflects which physical deployment actually
+    # has its files on local disk.
+    record.processed_by = get_settings().deployment_name
     if get_settings().database_configured:
         _create_db(record)
     else:
